@@ -58,6 +58,10 @@ stdenv.mkDerivation rec {
       --prefix PATH : ${lib.makeBinPath [ openjdk ]} \
       --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath buildInputs} \
       --run 'mkdir -p ''${XDG_DATA_HOME:-~/.local/share}/starsector' \
+      --run 'mkdir -p ''${XDG_DATA_HOME:-~/.local/share}/starsector/saves' \
+      --run 'mkdir -p ''${XDG_DATA_HOME:-~/.local/share}/starsector/screenshots' \
+      --run 'mkdir -p ''${XDG_DATA_HOME:-~/.local/share}/starsector/mods' \
+      --run 'mkdir -p ''${XDG_DATA_HOME:-~/.local/share}/starsector/logs' \
       --chdir "$out"
     ln -s $out/starsector.sh $out/bin/starsector
 
@@ -69,7 +73,11 @@ stdenv.mkDerivation rec {
   postPatch = ''
     substituteInPlace starsector.sh \
       --replace "./jre_linux/bin/java" "${openjdk}/bin/java" \
-      --replace "./native/linux" "$out/native/linux"
+      --replace "./native/linux" "$out/native/linux" \
+      --replace "./saves" '${XDG_DATA_HOME:-~/.local/share}/starsector/saves' \
+      --replace "./screenshots" '${XDG_DATA_HOME:-~/.local/share}/starsector/screenshots' \ 
+      --replace "./mods" '${XDG_DATA_HOME:-~/.local/share}/starsector/mods' \
+      --replace "paths.logs=." 'paths.log=${XDG_DATA_HOME:-~/.local/share}/starsector/logs'
   '';
 
   meta = with lib; {
